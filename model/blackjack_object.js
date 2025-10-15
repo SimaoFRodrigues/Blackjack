@@ -1,100 +1,184 @@
-// Blackjack object
-
-/**
- * Class that represents the Blackjack game.
- */
 class Blackjack {
-  // Constant that defines the maximum points to avoid busting in Blackjack
-  static MAX_POINTS = 25;
-  // Constant that defines the point threshold at which the dealer must stand
-  static DEALER_MAX_TURN_POINTS = 21;
+  // Constante que define a pontuação máxima para não rebentar (Blackjack 21).
+  static MAX_POINTS = 21;
+  // Constante que define a pontuação em que o dealer é obrigado a parar.
+  static DEALER_STANDS_ON = 17;
 
-  /**
-   * Creates an instance of Blackjack and initializes the deck.
-   */
+  //Cria uma instância do Blackjack e inicializa o jogo.
   constructor() {
-    this.dealerCards = []; // Array to hold the dealer's cards
-    this.playerCards = []; // Array to hold the player's cards
-    this.dealerTurn = false; // Flag to indicate if it's the dealer's turn to play
+    this.dealerCards = []; // Array para as cartas do dealer.
+    this.playerCards = []; // Array para as cartas do jogador.
+    this.dealerTurn = false; // Flag para indicar se é a vez do dealer jogar.
 
-    // State of the game with information about the outcome
+    // Objeto que guarda o estado do jogo.
     this.state = {
-      gameEnded: false, // Indicates whether the game has ended
-      playerWon: false, // Indicates if the player has won
-      dealerWon: false, // Indicates if the dealer has won
-      playerBusted: false, // Indicates if the player has exceeded MAX_POINTS
-      dealerBusted: false, // Indicates if the dealer has exceeded MAX_POINTS
+      gameEnded: false,
+      playerWon: false,
+      dealerWon: false,
+      isTie: false, // Para empates (Push).
+      playerBusted: false,
+      dealerBusted: false,
+      playerHasBlackjack: false,
+      dealerHasBlackjack: false,
     };
 
-    // Initialize the deck of cards
-    this.deck = this.shuffle(this.newDeck()); // Create and shuffle a new deck
+    //Inicializa o baralho de cartas, criando e baralhando um novo.
+    this.deck = this.shuffle(this.newDeck());
   }
 
-  //TODO: Implement this method
-  /**
-   * Creates a new deck of cards.
-   * @returns {Card[]} - An array of cards.
-   */
-  newDeck() {}
+  //Cria um baralho novo com 52 cartas.
+  newDeck() {
+    let values = [
+      "ace",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "jack",
+      "king",
+      "queen",
+    ];
+    let types = ["clubs", "diamonds", "hearts", "spades"];
+    let deck = [];
 
-  //TODO: Implement this method
-  /**
-   * Shuffles the deck of cards.
-   * @param {Card[]} deck - The deck of cards to be shuffled.
-   * @returns {Card[]} - The shuffled deck.
-   */
-  shuffle(deck) {}
+    for (let type of types) {
+      for (let value of values) {
+        deck.push(`${value}_of_${type}`);
+      }
+    }
+    return deck;
+  }
 
-  /**
-   * Returns the dealer's cards.
-   * @returns {Card[]} - An array containing the dealer's cards.
-   */
+  //Baralha um array de cartas usando o algoritmo Fisher-Yates.
+  shuffle(deck) {
+    for (let i = deck.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    return deck;
+  }
+
+  //Retorna uma cópia das cartas do dealer.
   getDealerCards() {
-    return this.dealerCards.slice(); // Return a copy of the dealer's cards
+    return this.dealerCards.slice();
   }
 
-  /**
-   * Returns the player's cards.
-   * @returns {Card[]} - An array containing the player's cards.
-   */
+  //Retorna uma cópia das cartas do jogador.
   getPlayerCards() {
-    return this.playerCards.slice(); // Return a copy of the player's cards
+    return this.playerCards.slice();
   }
 
-  /**
-   * Sets whether it is the dealer's turn to play.
-   * @param {boolean} val - Value indicating if it's the dealer's turn.
-   */
+  //Define se é a vez do dealer jogar.
   setDealerTurn(val) {
-    this.dealerTurn = val; // Update the dealer's turn status
+    this.dealerTurn = val;
   }
 
-  //TODO: Implement this method
-  /**
-   * Calculates the total value of the provided cards.
-   * @param {Card[]} cards - Array of cards to be evaluated.
-   * @returns {number} - The total value of the cards.
-   */
-  getCardsValue(cards) {}
+  //Obtém o valor numérico de uma única carta.
+  getCardValue(card) {
+    let value = card.split("_of_")[0];
+    if (isNaN(parseInt(value))) {
+      if (value === "ace") return 11;
+      return 10; // jack, queen, king
+    }
+    return parseInt(value);
+  }
 
-  //TODO: Implement this method
-  /**
-   * Executes the dealer's move by adding a card to the dealer's array.
-   * @returns {Object} - The game state after the dealer's move.
-   */
-  dealerMove() {}
+  //Calcula a pontuação total de uma mão, tratando os Ases de forma inteligente.
+  getScore(cards) {
+    let score = 0;
+    let aceCount = cards.filter((card) => card.startsWith("ace")).length;
 
-  //TODO: Implement this method
-  /**
-   * Executes the player's move by adding a card to the player's array.
-   * @returns {Object} - The game state after the player's move.
-   */
-  playerMove() {}
+    for (const card of cards) {
+      score += this.getCardValue(card);
+    }
 
-  //TODO: Implement this method
-  /**
-   * Checks the game state based on the dealer's and player's cards.
-   * @returns {Object} - The updated game state.
-   */
-  getGameState() {}
+    while (score > Blackjack.MAX_POINTS && aceCount > 0) {
+      score -= 10;
+      aceCount--;
+    }
+    return score;
+  }
+
+  //executa a jogada do dealer: tira uma carta do baralho e adiciona à sua mão.
+  dealerMove() {
+    if (!this.state.gameEnded) {
+      this.dealerCards.push(this.deck.pop());
+      return this.getGameState();
+    }
+    return this.state;
+  }
+
+  //executa a jogada do jogador: tira uma carta do baralho e adiciona à sua mão.
+  playerMove() {
+    if (!this.state.gameEnded) {
+      this.playerCards.push(this.deck.pop());
+      return this.getGameState();
+    }
+    return this.state;
+  }
+
+  //Verifica o estado do jogo (quem ganhou, perdeu, rebentou ou empatou) e atualiza o objeto state.
+  getGameState() {
+    const playerScore = this.getScore(this.playerCards);
+    const dealerScore = this.getScore(this.dealerCards);
+
+    // Verifica se é um Blackjack inicial (2 cartas)
+    if (this.playerCards.length === 2 && playerScore === Blackjack.MAX_POINTS) {
+      this.state.playerHasBlackjack = true;
+    }
+    if (this.dealerCards.length === 2 && dealerScore === Blackjack.MAX_POINTS) {
+      this.state.dealerHasBlackjack = true;
+    }
+
+    // Se o jogador tem Blackjack
+    if (this.state.playerHasBlackjack) {
+      if (this.state.dealerHasBlackjack) {
+        this.state.isTie = true; // Ambos têm Blackjack, é um empate.
+      } else {
+        this.state.playerWon = true;
+      }
+      this.state.gameEnded = true;
+      return this.state;
+    }
+    // Se só o dealer tem Blackjack
+    if (this.state.dealerHasBlackjack) {
+      this.state.dealerWon = true;
+      this.state.gameEnded = true;
+      return this.state;
+    }
+
+    // Verifica se o jogador rebentou.
+    if (playerScore > Blackjack.MAX_POINTS) {
+      this.state.playerBusted = true;
+      this.state.dealerWon = true;
+      this.state.gameEnded = true;
+      return this.state;
+    }
+
+    // Lógica para quando é a vez do dealer jogar (depois de o jogador parar).
+    if (this.dealerTurn) {
+      // Dealer rebentou.
+      if (dealerScore > Blackjack.MAX_POINTS) {
+        this.state.dealerBusted = true;
+        this.state.playerWon = true;
+        this.state.gameEnded = true;
+      } else if (dealerScore >= Blackjack.DEALER_STANDS_ON) {
+        // Dealer para de jogar. Compara as pontuações.
+        if (dealerScore > playerScore) {
+          this.state.dealerWon = true;
+        } else if (playerScore > dealerScore) {
+          this.state.playerWon = true;
+        } else {
+          this.state.isTie = true; // Empate
+        }
+        this.state.gameEnded = true;
+      }
+    }
+    return this.state;
+  }
 }

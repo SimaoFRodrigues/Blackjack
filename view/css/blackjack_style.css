@@ -1,4 +1,64 @@
 body {
-  background: url("/view/img/blackjack_table.png") no-repeat center center fixed;
+  /* CORREÇÃO: Subir um nível (para a pasta 'view') e depois entrar em 'img' */
+  background: url("../img/blackjack_table.png") no-repeat center center fixed;
   background-size: cover;
+  text-align: center;
+  color: white;
+}
+
+/* Novo contentor para posicionar o jogo à esquerda */
+.game-container {
+  position: absolute;
+  top: 10%; /* Distância do topo */
+  left: 5%; /* Distância da esquerda */
+  width: auto; /* Largura automática baseada no conteúdo */
+}
+
+.dealer {
+  color: rgb(255, 255, 255);
+  text-shadow: 1px 1px 2px black;
+}
+
+.player {
+  color: rgb(255, 255, 255);
+  text-shadow: 1px 1px 2px black;
+}
+
+.montserrat-body {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.botao-card {
+  background-color: rgb(182, 31, 31);
+  color: white;
+}
+
+.botao-card:hover {
+  background-color: rgb(122, 19, 19);
+  color: white;
+}
+
+.botao-stand {
+  background-color: rgb(215, 218, 181);
+  color: rgb(0, 0, 0);
+}
+
+.botao-stand:hover {
+  background-color: rgb(187, 190, 153);
+  color: rgb(0, 0, 0);
+}
+
+#cartas-dealer img {
+  height: 170px;
+  width: 120px;
+  margin: 1px;
+}
+
+#cartas-jogador img {
+  height: 170px;
+  width: 120px;
+  margin: 1px;
 }
