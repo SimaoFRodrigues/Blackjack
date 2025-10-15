@@ -7,46 +7,44 @@ let game = null; // Stores the current instance of the game
  * @param {Object} obj - The object to be debugged.
  */
 function debug(obj) {
-    document.getElementById('debug').innerHTML = JSON.stringify(obj); // Displays the state of the object as JSON
+  document.getElementById("debug").innerHTML = JSON.stringify(obj); // Displays the state of the object as JSON
 }
 
 /**
  * Initializes the game buttons.
  */
 function buttonsInitialization() {
-    document.getElementById('card').disabled = false; // Enables the button to draw a card
-    document.getElementById('stand').disabled = false; // Enables the button to stand
-    document.getElementById('new_game').disabled = true; // Disables the button for a new game
+  document.getElementById("card").disabled = false; // Enables the button to draw a card
+  document.getElementById("stand").disabled = false; // Enables the button to stand
+  document.getElementById("new_game").disabled = true; // Disables the button for a new game
 }
 
 /**
  * Finalizes the buttons after the game ends.
  */
 function finalizeButtons() {
-    //TODO: Reveal the dealer's hidden card if you hid it like you were supposed to.
+  //TODO: Reveal the dealer's hidden card if you hid it like you were supposed to.
 
-    document.getElementById('card').disabled = true; // Disables the button to draw a card
-    document.getElementById('stand').disabled = true; // Disables the button to stand
-    document.getElementById('new_game').disabled = false; // Enables the button for a new game
+  document.getElementById("card").disabled = true; // Disables the button to draw a card
+  document.getElementById("stand").disabled = true; // Disables the button to stand
+  document.getElementById("new_game").disabled = false; // Enables the button for a new game
 }
 
 //TODO: Implement this method.
 /**
  * Clears the page to start a new game.
  */
-function clearPage() {
-
-}
+function clearPage() {}
 
 //TODO: Complete this method.
 /**
  * Starts a new game of Blackjack.
  */
 function newGame() {
-    game = new Blackjack(); // Creates a new instance of the Blackjack game
-    debug(game); // Displays the current state of the game for debugging
+  game = new Blackjack(); // Creates a new instance of the Blackjack game
+  debug(game); // Displays the current state of the game for debugging
 
-    //TODO: Add missing code.
+  //TODO: Add missing code.
 }
 
 //TODO: Implement this method.
@@ -54,53 +52,41 @@ function newGame() {
  * Calculates and displays the final score of the game.
  * @param {Object} state - The current state of the game.
  */
-function finalScore(state) {
-
-}
+function finalScore(state) {}
 
 //TODO: Implement this method.
 /**
  * Updates the dealer's state in the game.
  * @param {Object} state - The current state of the game.
  */
-function updateDealer(state) {
-
-}
+function updateDealer(state) {}
 
 //TODO: Implement this method.
 /**
  * Updates the player's state in the game.
  * @param {Object} state - The current state of the game.
  */
-function updatePlayer(state) {
-
-}
+function updatePlayer(state) {}
 
 //TODO: Implement this method.
 /**
  * Causes the dealer to draw a new card.
  * @returns {Object} - The game state after the dealer's move.
  */
-function dealerNewCard() {
-
-}
+function dealerNewCard() {}
 
 //TODO: Implement this method.
 /**
  * Causes the player to draw a new card.
  * @returns {Object} - The game state after the player's move.
  */
-function playerNewCard() {
-
-}
+function playerNewCard() {}
 
 //TODO: Implement this method.
 /**
  * Finishes the dealer's turn.
  */
-function dealerFinish() {
-
-}
+function dealerFinish() {}
 
 //TODO: Implement this method.
 /**
@@ -109,6 +95,4 @@ function dealerFinish() {
  * @param {Card} card - The card to be displayed.
  * @param {boolean} [replace=false] - Indicates whether to replace the existing image.
  */
-function printCard(element, card, replace = false) {
-
-}
+function printCard(element, card, replace = false) {}
