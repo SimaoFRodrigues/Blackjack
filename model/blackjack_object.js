@@ -1,32 +1,30 @@
 class Blackjack {
-  // Constante que define a pontuação máxima para não rebentar (Blackjack 21).
-  static MAX_POINTS = 21;
-  // Constante que define a pontuação em que o dealer é obrigado a parar.
-  static DEALER_STANDS_ON = 17;
+  static MAX_POINTS = 21; //pontuação máxima para não rebentar
+  static DEALER_STANDS_ON = 17; //pontuação em que o dealer é obrigado a parar
 
-  //Cria uma instância do Blackjack e inicializa o jogo.
+  // cria uma instância do Blackjack e inicializa o jogo
   constructor() {
-    this.dealerCards = []; // Array para as cartas do dealer.
-    this.playerCards = []; // Array para as cartas do jogador.
-    this.dealerTurn = false; // Flag para indicar se é a vez do dealer jogar.
+    this.dealerCards = []; // array para as cartas do dealer
+    this.playerCards = []; // array para as cartas do jogador
+    this.dealerTurn = false; // flag para indicar se é a vez do dealer jogar
 
-    // Objeto que guarda o estado do jogo.
+    // objeto que guarda o estado do jogo
     this.state = {
       gameEnded: false,
       playerWon: false,
       dealerWon: false,
-      isTie: false, // Para empates (Push).
+      isTie: false, // para empates
       playerBusted: false,
       dealerBusted: false,
       playerHasBlackjack: false,
       dealerHasBlackjack: false,
     };
 
-    //Inicializa o baralho de cartas, criando e baralhando um novo.
+    // inicializa o baralho de cartas, criando e baralhando um novo
     this.deck = this.shuffle(this.newDeck());
   }
 
-  //Cria um baralho novo com 52 cartas.
+  // cria um baralho novo com 52 cartas
   newDeck() {
     let values = [
       "ace",
@@ -54,7 +52,7 @@ class Blackjack {
     return deck;
   }
 
-  //Baralha um array de cartas usando o algoritmo Fisher-Yates.
+  // baralha um array de cartas usando o algoritmo Fisher-Yates
   shuffle(deck) {
     for (let i = deck.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
@@ -63,22 +61,22 @@ class Blackjack {
     return deck;
   }
 
-  //Retorna uma cópia das cartas do dealer.
+  // retorna uma cópia das cartas do dealer
   getDealerCards() {
     return this.dealerCards.slice();
   }
 
-  //Retorna uma cópia das cartas do jogador.
+  // retorna uma cópia das cartas do jogador
   getPlayerCards() {
     return this.playerCards.slice();
   }
 
-  //Define se é a vez do dealer jogar.
+  // define se é a vez do dealer jogar
   setDealerTurn(val) {
     this.dealerTurn = val;
   }
 
-  //Obtém o valor numérico de uma única carta.
+  // obtem o valor numerico de uma única carta
   getCardValue(card) {
     let value = card.split("_of_")[0];
     if (isNaN(parseInt(value))) {
@@ -88,7 +86,7 @@ class Blackjack {
     return parseInt(value);
   }
 
-  //Calcula a pontuação total de uma mão, tratando os Ases de forma inteligente.
+  // calcula a pontuação total de uma mao, tratando os Ases de forma inteligente
   getScore(cards) {
     let score = 0;
     let aceCount = cards.filter((card) => card.startsWith("ace")).length;
@@ -104,7 +102,7 @@ class Blackjack {
     return score;
   }
 
-  //executa a jogada do dealer: tira uma carta do baralho e adiciona à sua mão.
+  // executa a jogada do dealer: tira uma carta do baralho e adiciona à sua mão
   dealerMove() {
     if (!this.state.gameEnded) {
       this.dealerCards.push(this.deck.pop());
@@ -113,7 +111,7 @@ class Blackjack {
     return this.state;
   }
 
-  //executa a jogada do jogador: tira uma carta do baralho e adiciona à sua mão.
+  // tira uma carta do baralho e adiciona à mão do jogador
   playerMove() {
     if (!this.state.gameEnded) {
       this.playerCards.push(this.deck.pop());
@@ -122,12 +120,12 @@ class Blackjack {
     return this.state;
   }
 
-  //Verifica o estado do jogo (quem ganhou, perdeu, rebentou ou empatou) e atualiza o objeto state.
+  // verifica o estado do jogo (quem ganhou, perdeu, rebentou ou empatou) e atualiza o objeto state
   getGameState() {
     const playerScore = this.getScore(this.playerCards);
     const dealerScore = this.getScore(this.dealerCards);
 
-    // Verifica se é um Blackjack inicial (2 cartas)
+    // verifica se é um Blackjack inicial (2 cartas)
     if (this.playerCards.length === 2 && playerScore === Blackjack.MAX_POINTS) {
       this.state.playerHasBlackjack = true;
     }
@@ -135,24 +133,24 @@ class Blackjack {
       this.state.dealerHasBlackjack = true;
     }
 
-    // Se o jogador tem Blackjack
+    // se o jogador tem Blackjack
     if (this.state.playerHasBlackjack) {
       if (this.state.dealerHasBlackjack) {
-        this.state.isTie = true; // Ambos têm Blackjack, é um empate.
+        this.state.isTie = true; // ambos tem Blackjack, é um empate
       } else {
         this.state.playerWon = true;
       }
       this.state.gameEnded = true;
       return this.state;
     }
-    // Se só o dealer tem Blackjack
+    // se só o dealer tem Blackjack
     if (this.state.dealerHasBlackjack) {
       this.state.dealerWon = true;
       this.state.gameEnded = true;
       return this.state;
     }
 
-    // Verifica se o jogador rebentou.
+    // verifica se o jogador rebentou
     if (playerScore > Blackjack.MAX_POINTS) {
       this.state.playerBusted = true;
       this.state.dealerWon = true;
@@ -160,21 +158,21 @@ class Blackjack {
       return this.state;
     }
 
-    // Lógica para quando é a vez do dealer jogar (depois de o jogador parar).
+    // logica para quando é a vez do dealer jogar, depois do jogador parar
     if (this.dealerTurn) {
-      // Dealer rebentou.
+      // dealer rebentou
       if (dealerScore > Blackjack.MAX_POINTS) {
         this.state.dealerBusted = true;
         this.state.playerWon = true;
         this.state.gameEnded = true;
       } else if (dealerScore >= Blackjack.DEALER_STANDS_ON) {
-        // Dealer para de jogar. Compara as pontuações.
+        // eealer para de jogar. Compara as pontuações
         if (dealerScore > playerScore) {
           this.state.dealerWon = true;
         } else if (playerScore > dealerScore) {
           this.state.playerWon = true;
         } else {
-          this.state.isTie = true; // Empate
+          this.state.isTie = true; // empate
         }
         this.state.gameEnded = true;
       }

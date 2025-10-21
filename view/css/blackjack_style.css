@@ -1,12 +1,11 @@
 body {
-  /* CORREÇÃO: Subir um nível (para a pasta 'view') e depois entrar em 'img' */
   background: url("../img/blackjack_table.png") no-repeat center center fixed;
   background-size: cover;
   text-align: center;
   color: white;
 }
 
-/* Novo contentor para posicionar o jogo à esquerda */
+/*Novo contentor para posicionar o jogo à esquerda*/
 .game-container {
   position: absolute;
   top: 10%; /* Distância do topo */

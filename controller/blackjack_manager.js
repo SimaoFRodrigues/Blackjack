@@ -1,35 +1,26 @@
 let game = null; // Armazena a instância atual do jogo.
 let dealerHiddenCard = null; // Armazena a carta virada do dealer.
 
-/**
- * Função para depurar e mostrar o estado do objeto do jogo.
- * @param {Object} obj - O objeto a ser depurado.
- */
+//Função para depurar e mostrar o estado do objeto do jogo
 function debug(obj) {
   document.getElementById("debug").innerHTML = JSON.stringify(obj, null, 2);
 }
 
-/**
- * Inicializa os botões para um novo jogo.
- */
+// inicializa os botões para um novo jogo
 function buttonsInitialization() {
   document.getElementById("card").disabled = false;
   document.getElementById("stand").disabled = false;
   document.getElementById("new_game").disabled = true;
 }
 
-/**
- * Finaliza os botões no fim do jogo.
- */
+// finaliza os botões no fim do jogo
 function finalizeButtons() {
   document.getElementById("card").disabled = true;
   document.getElementById("stand").disabled = true;
   document.getElementById("new_game").disabled = false;
 }
 
-/**
- * Limpa a página para um novo jogo.
- */
+// limpa a página para um novo jogo
 function clearPage() {
   document.getElementById("cartas-dealer").innerHTML = "";
   document.getElementById("cartas-jogador").innerHTML = "";
@@ -39,25 +30,23 @@ function clearPage() {
   document.getElementById("debug").innerHTML = "";
 }
 
-/**
- * Inicia um novo jogo de Blackjack.
- */
+// inicia um novo jogo de Blackjack
 function newGame() {
   clearPage();
   game = new Blackjack();
 
-  // Dá as cartas iniciais (2 para o jogador, 2 para o dealer com uma virada).
+  // da as cartas iniciais (2 para o jogador, 2 para o dealer com uma delas virada)
   game.playerMove();
   game.dealerMove();
   game.playerMove();
-  dealerHiddenCard = game.deck.pop(); // Guarda a carta escondida.
+  dealerHiddenCard = game.deck.pop(); // guarda a carta escondida
   game.dealerCards.push(dealerHiddenCard);
 
-  // Mostra as cartas na interface.
+  // mostra as cartas na interface
   updatePlayer();
-  // Mostra a carta visível do dealer e uma carta virada.
+  // mostra a carta visível do dealer e uma carta virada
   printCard(document.getElementById("cartas-dealer"), game.getDealerCards()[0]);
-  // CORREÇÃO: Usar o nome de ficheiro correto para a carta virada.
+  // usar o nome de ficheiro correto para a carta virada
   printCard(document.getElementById("cartas-dealer"), "card_back");
   document.getElementById("pontuacao-dealer").innerText = game.getCardValue(
     game.getDealerCards()[0]
@@ -66,17 +55,14 @@ function newGame() {
   buttonsInitialization();
   debug(game);
 
-  // Verifica se há um Blackjack inicial para terminar o jogo logo.
+  // verifica se há um Blackjack inicial para terminar o jogo logo
   const state = game.getGameState();
   if (state.gameEnded) {
-    dealerFinish(); // Chama dealerFinish para revelar as cartas e mostrar o resultado.
+    dealerFinish(); // para revelar as cartas e mostrar o resultado
   }
 }
 
-/**
- * Mostra a mensagem final do jogo.
- * @param {Object} state - O estado final do jogo.
- */
+// mostra a mensagem final do jogo
 function finalScore(state) {
   let message = "";
   if (state.playerHasBlackjack && !state.isTie) {
@@ -86,31 +72,26 @@ function finalScore(state) {
   } else if (state.dealerWon) {
     message = "O Dealer Ganhou!";
   } else if (state.isTie) {
-    message = "Empate (Push)!";
+    message = "Empate!";
   }
 
   if (state.playerBusted) {
-    message = "O Jogador Rebentou! Dealer Ganhou.";
+    message = "O Jogador Rebentou! O Dealer Ganhou";
   } else if (state.dealerBusted) {
-    message = "O Dealer Rebentou! Jogador Ganhou.";
+    message = "O Dealer Rebentou! O Jogador Ganhou";
   }
 
   document.getElementById("resultado").innerText = message;
   finalizeButtons();
 }
 
-/**
- * Atualiza a pontuação do dealer na interface.
- */
+// atualiza a pontuação do dealer na interface
 function updateDealer() {
   const dealerScore = game.getScore(game.getDealerCards());
   document.getElementById("pontuacao-dealer").innerText = dealerScore;
 }
 
-/**
- * Atualiza as cartas e a pontuação do jogador na interface.
- * @param {Object} [state] - O estado do jogo (opcional).
- */
+// atualiza as cartas e a pontuação do jogador na interface
 function updatePlayer(state) {
   const playerCards = game.getPlayerCards();
   document.getElementById("cartas-jogador").innerHTML = "";
@@ -125,13 +106,10 @@ function updatePlayer(state) {
   }
 }
 
-/**
- * Faz o dealer tirar uma nova carta.
- * @returns {Object} - O estado do jogo após a jogada.
- */
+// faz o dealer tirar uma nova carta
 function dealerNewCard() {
   const state = game.dealerMove();
-  // Limpa e reimprime as cartas do dealer.
+  // limpa e reimprime as cartas do dealer
   const dealerCards = game.getDealerCards();
   document.getElementById("cartas-dealer").innerHTML = "";
   for (const card of dealerCards) {
@@ -142,23 +120,19 @@ function dealerNewCard() {
   return state;
 }
 
-/**
- * Faz o jogador tirar uma nova carta (ação do botão "Card").
- */
+// faz o jogador tirar uma nova carta (ação do botão "Pedir Carta")
 function playerNewCard() {
   const state = game.playerMove();
   updatePlayer(state);
   debug(game);
 }
 
-/**
- * Finaliza a vez do jogador e inicia a vez do dealer (ação do botão "Stand").
- */
+// finaliza a vez do jogador e inicia a vez do dealer (ação do botão "Ficar")
 function dealerFinish() {
   game.setDealerTurn(true);
-  finalizeButtons(); // Desativa botões do jogador.
+  finalizeButtons(); // desativa botões do jogador
 
-  // Revela a carta escondida do dealer.
+  // revela a carta escondida do dealer
   const dealerCards = game.getDealerCards();
   document.getElementById("cartas-dealer").innerHTML = "";
   for (const card of dealerCards) {
@@ -166,38 +140,28 @@ function dealerFinish() {
   }
   updateDealer();
 
-  // Loop para as jogadas automáticas do dealer.
+  // loop para as jogadas automaticas do dealer
   let state = game.getGameState();
-  // Se o jogo não terminou logo após revelar as cartas (ex: dealer não tem 17), o dealer joga.
+  // se o jogo não terminou depois de revelar as cartas, o dealer joga
   if (!state.gameEnded) {
     const dealerInterval = setInterval(() => {
-      state = game.getGameState(); // Reavalia o estado antes de cada jogada.
+      state = game.getGameState(); // reavalia o estado antes de cada jogada
       if (!state.gameEnded) {
         dealerNewCard();
       } else {
-        clearInterval(dealerInterval); // Para o loop.
+        clearInterval(dealerInterval); // para o loop
         finalScore(state);
       }
-    }, 1000); // Espera 1 segundo entre cada jogada do dealer.
+    }, 1000); // espera 1 segundo entre cada jogada do dealer dara dinamizar
   } else {
-    // Se o jogo terminou assim que as cartas foram reveladas, mostra o resultado final.
+    // se o jogo acabar quando as cartas forem reveladas, mostra o resultado final
     finalScore(state);
   }
 }
 
-/**
- * Imprime a imagem da carta na interface gráfica.
- * @param {HTMLElement} element - O elemento onde a carta será mostrada.
- * @param {string} card - A carta a ser mostrada (ou "back" para a carta virada).
- */
+// Imprime a imagem da carta na interface gráfica
 function printCard(element, card) {
-  let cardImg = document.createElement("img");
-
-  // CORREÇÃO: O caminho precisa incluir a subpasta "png".
-  // O caminho é relativo ao ficheiro HTML que está em /view.
+  let cardImg = document.createElement("img"); // elemento onde a carta será mostrada
   cardImg.src = `img/png/${card}.png`;
-
-  cardImg.style.height = "170px";
-  cardImg.classList.add("mx-1");
   element.appendChild(cardImg);
 }
