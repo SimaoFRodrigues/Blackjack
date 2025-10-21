@@ -61,12 +61,12 @@ class Blackjack {
     return deck;
   }
 
-  // retorna uma cópia das cartas do dealer
+  // retorna uma copia das cartas do dealer
   getDealerCards() {
     return this.dealerCards.slice();
   }
 
-  // retorna uma cópia das cartas do jogador
+  // retorna uma copia das cartas do jogador
   getPlayerCards() {
     return this.playerCards.slice();
   }
@@ -76,7 +76,7 @@ class Blackjack {
     this.dealerTurn = val;
   }
 
-  // obtem o valor numerico de uma única carta
+  // obtem o valor numerico de uma unica carta
   getCardValue(card) {
     let value = card.split("_of_")[0];
     if (isNaN(parseInt(value))) {

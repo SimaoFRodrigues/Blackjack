@@ -159,7 +159,7 @@ function dealerFinish() {
   }
 }
 
-// Imprime a imagem da carta na interface gráfica
+// imprime a imagem da carta na interface grafica
 function printCard(element, card) {
   let cardImg = document.createElement("img"); // elemento onde a carta será mostrada
   cardImg.src = `img/png/${card}.png`;

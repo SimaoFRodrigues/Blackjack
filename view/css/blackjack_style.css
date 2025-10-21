@@ -16,11 +16,13 @@ body {
 .dealer {
   color: rgb(255, 255, 255);
   text-shadow: 1px 1px 2px black;
+  margin-bottom: 0;
 }
 
 .player {
   color: rgb(255, 255, 255);
   text-shadow: 1px 1px 2px black;
+  margin-bottom: 0;
 }
 
 .montserrat-body {
@@ -51,13 +53,47 @@ body {
 }
 
 #cartas-dealer img {
-  height: 170px;
-  width: 120px;
+  height: 150px;
+  width: 100px;
   margin: 1px;
 }
 
 #cartas-jogador img {
-  height: 170px;
-  width: 120px;
+  height: 150px;
+  width: 100px;
   margin: 1px;
+}
+
+@media (max-width: 991px) {
+  #cartas-dealer img {
+    height: 130px;
+    width: 80px;
+    margin: 1px;
+  }
+
+  #cartas-jogador img {
+    height: 130px;
+    width: 80px;
+    margin: 1px;
+  }
+
+  .dealer {
+    color: rgb(255, 255, 255);
+    text-shadow: 1px 1px 2px black;
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+
+  .player {
+    color: rgb(255, 255, 255);
+    text-shadow: 1px 1px 2px black;
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+
+  .headerBj {
+    font-size: 25px;
+    margin-bottom: 20px;
+    margin-bottom: 0;
+  }
 }
