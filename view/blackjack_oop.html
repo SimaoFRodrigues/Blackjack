@@ -36,8 +36,15 @@
 
   <body class="montserrat-body">
     <header class="container text-start mt-4">
-      <h1 class="display-4 headerBj">Blackjack 21</h1>
+      <h1 class="headerBj">Blackjack 21</h1>
     </header>
+    <!-- Placar -->
+    <div id="scoreboard" class="my-3 text-white text-start mx-5 placar">
+      <strong>Vitórias Dealer:</strong>
+      <span id="total-dealer-wins">0</span> &nbsp; <strong>Empates:</strong>
+      <span id="empates">0</span> &nbsp; <strong>Vitórias Jogador:</strong>
+      <span id="total-player-wins">0</span>
+    </div>
 
     <section class="container mt-1">
       <!-- Secção do Jogo -->
@@ -48,7 +55,7 @@
           <div
             id="cartas-dealer"
             class="d-flex justify-content-center align-items-center"
-            style="min-height: 180px"
+            style="min-height: 120px"
           >
             <!-- As cartas do dealer -->
           </div>
@@ -60,34 +67,24 @@
           <div
             id="cartas-jogador"
             class="d-flex justify-content-center align-items-center"
-            style="min-height: 180px"
+            style="min-height: 120px"
           >
             <!-- As cartas do jogador -->
           </div>
         </div>
 
         <!-- Resultado do Jogo -->
-        <div id="resultado-container" class="my-4" style="min-height: 50px">
+        <div id="resultado-container" class="my-1" style="min-height: 50px">
           <h3 id="resultado" class="text-warning"></h3>
         </div>
 
         <!-- Botões -->
         <div id="botoes-acao">
-          <button
-            class="btn btn-lg botao-card mx-2"
-            id="card"
-            type="button"
-            onclick="playerNewCard()"
-          >
+          <button class="btn btn-lg botao-card mx-2" id="card" type="button">
             <i class="bi bi-plus-circle"></i> Pedir Carta
           </button>
 
-          <button
-            class="btn btn-lg botao-stand mx-2"
-            id="stand"
-            type="button"
-            onclick="dealerFinish()"
-          >
+          <button class="btn btn-lg botao-stand mx-2" id="stand" type="button">
             <i class="bi bi-stop-circle"></i> Ficar
           </button>
 
@@ -95,22 +92,11 @@
             class="btn btn-success btn-lg rounded-pill mx-2"
             id="new_game"
             type="button"
-            onclick="newGame()"
             disabled
           >
             <i class="bi bi-arrow-repeat"></i> Novo Jogo
           </button>
         </div>
-      </section>
-
-      <!-- Secção de Debug -->
-      <section
-        id="sec_debug"
-        class="mt-5 p-3 bg-dark rounded"
-        style="display: none"
-      >
-        <h2>Debug</h2>
-        <pre id="debug" class="text-white-50"></pre>
       </section>
     </section>
     <!-- Footer -->
@@ -127,13 +113,11 @@
       crossorigin="anonymous"
     ></script>
 
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <!-- Scripts do Jogo -->
     <script src="../model/blackjack_object.js"></script>
     <script src="../controller/blackjack_manager.js"></script>
-
-    <!-- Inicia o jogo quando a página carrega -->
-    <script>
-      window.onload = newGame;
-    </script>
   </body>
 </html>

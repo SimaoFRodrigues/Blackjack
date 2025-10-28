@@ -1,33 +1,83 @@
-let game = null; // Armazena a instância atual do jogo.
-let dealerHiddenCard = null; // Armazena a carta virada do dealer.
+let game = null; // armazena a instância atual do jogo
 
-//Função para depurar e mostrar o estado do objeto do jogo
-function debug(obj) {
-  document.getElementById("debug").innerHTML = JSON.stringify(obj, null, 2);
+// bonus: placar, com persistência na memória local
+let totalDealerWins = 0;
+let empates = 0;
+let totalPlayerWins = 0;
+
+function updateScoreboard() {
+  $("#total-dealer-wins").text(totalDealerWins);
+  $("#empates").text(empates);
+  $("#total-player-wins").text(totalPlayerWins);
 }
 
-// inicializa os botões para um novo jogo
+// guarda o placar no localStorage
+function saveScoreboard() {
+  try {
+    localStorage.setItem(
+      "blackjack_totalDealerWins",
+      totalDealerWins.toString()
+    );
+    localStorage.setItem("blackjack_empates", empates.toString());
+    localStorage.setItem(
+      "blackjack_totalPlayerWins",
+      totalPlayerWins.toString()
+    );
+  } catch (e) {
+    // se falhar, ignorar pq o jogo continua sem persistência
+  }
+}
+
+// carrega o placar e pra cada key se não existir, define 0, se existir, converte para inteiro
+function loadScoreboard() {
+  let d = localStorage.getItem("blackjack_totalDealerWins");
+  if (d === null) {
+    totalDealerWins = 0;
+  } else {
+    totalDealerWins = parseInt(d, 10);
+    if (isNaN(totalDealerWins)) totalDealerWins = 0;
+  }
+
+  let e = localStorage.getItem("blackjack_empates");
+  if (e === null) {
+    empates = 0;
+  } else {
+    empates = parseInt(e, 10);
+    if (isNaN(empates)) empates = 0;
+  }
+
+  let p = localStorage.getItem("blackjack_totalPlayerWins");
+  if (p === null) {
+    totalPlayerWins = 0;
+  } else {
+    totalPlayerWins = parseInt(p, 10);
+    if (isNaN(totalPlayerWins)) totalPlayerWins = 0;
+  }
+
+  updateScoreboard();
+}
+
+// inicia os botões para um novo jogo
 function buttonsInitialization() {
-  document.getElementById("card").disabled = false;
-  document.getElementById("stand").disabled = false;
-  document.getElementById("new_game").disabled = true;
+  $("#card").prop("disabled", false);
+  $("#stand").prop("disabled", false);
+  $("#new_game").prop("disabled", true);
 }
 
 // finaliza os botões no fim do jogo
 function finalizeButtons() {
-  document.getElementById("card").disabled = true;
-  document.getElementById("stand").disabled = true;
-  document.getElementById("new_game").disabled = false;
+  $("#card").prop("disabled", true);
+  $("#stand").prop("disabled", true);
+  $("#new_game").prop("disabled", false);
 }
 
-// limpa a página para um novo jogo
+// limpa a página para o proximo jogo
 function clearPage() {
-  document.getElementById("cartas-dealer").innerHTML = "";
-  document.getElementById("cartas-jogador").innerHTML = "";
-  document.getElementById("pontuacao-dealer").innerText = "";
-  document.getElementById("pontuacao-jogador").innerText = "";
-  document.getElementById("resultado").innerText = "";
-  document.getElementById("debug").innerHTML = "";
+  $("#cartas-dealer").html("");
+  $("#cartas-jogador").html("");
+  $("#pontuacao-dealer").text("");
+  $("#pontuacao-jogador").text("");
+  $("#resultado").text("");
 }
 
 // inicia um novo jogo de Blackjack
@@ -35,27 +85,21 @@ function newGame() {
   clearPage();
   game = new Blackjack();
 
-  // da as cartas iniciais (2 para o jogador, 2 para o dealer com uma delas virada)
+  // da as cartas iniciais, dá 2 cartas a cada, a do dealer virada
   game.playerMove();
   game.dealerMove();
   game.playerMove();
-  dealerHiddenCard = game.deck.pop(); // guarda a carta escondida
-  game.dealerCards.push(dealerHiddenCard);
+  game.dealerCards.push(game.deck.pop());
 
   // mostra as cartas na interface
   updatePlayer();
-  // mostra a carta visível do dealer e uma carta virada
-  printCard(document.getElementById("cartas-dealer"), game.getDealerCards()[0]);
-  // usar o nome de ficheiro correto para a carta virada
-  printCard(document.getElementById("cartas-dealer"), "card_back");
-  document.getElementById("pontuacao-dealer").innerText = game.getCardValue(
-    game.getDealerCards()[0]
-  );
+  printCard($("#cartas-dealer"), game.getDealerCards()[0]);
+  printCard($("#cartas-dealer"), "card_back");
+  $("#pontuacao-dealer").text(game.getCardValue(game.getDealerCards()[0]));
 
   buttonsInitialization();
-  debug(game);
 
-  // verifica se há um Blackjack inicial para terminar o jogo logo
+  // verifica se há um Blackjack inicial para acabar logo o jogo
   const state = game.getGameState();
   if (state.gameEnded) {
     dealerFinish(); // para revelar as cartas e mostrar o resultado
@@ -66,9 +110,9 @@ function newGame() {
 function finalScore(state) {
   let message = "";
   if (state.playerHasBlackjack && !state.isTie) {
-    message = "Blackjack! O Jogador Ganhou!";
+    message = "Blackjack! Ganhaste!";
   } else if (state.playerWon) {
-    message = "O Jogador Ganhou!";
+    message = "Ganhaste!";
   } else if (state.dealerWon) {
     message = "O Dealer Ganhou!";
   } else if (state.isTie) {
@@ -76,30 +120,52 @@ function finalScore(state) {
   }
 
   if (state.playerBusted) {
-    message = "O Jogador Rebentou! O Dealer Ganhou";
+    message = "Rebentaste! O Dealer Ganhou";
   } else if (state.dealerBusted) {
     message = "O Dealer Rebentou! O Jogador Ganhou";
   }
 
-  document.getElementById("resultado").innerText = message;
+  // determina vencedor (uma única vez) e actualiza placar
+  let winner = null;
+  if (state.isTie) {
+    winner = "tie";
+  } else if (state.playerBusted) {
+    winner = "dealer";
+  } else if (state.dealerBusted) {
+    winner = "player";
+  } else if (state.playerHasBlackjack && !state.isTie) {
+    winner = "player";
+  } else if (state.playerWon) {
+    winner = "player";
+  } else if (state.dealerWon) {
+    winner = "dealer";
+  }
+
+  if (winner === "dealer") totalDealerWins++;
+  else if (winner === "player") totalPlayerWins++;
+  else if (winner === "tie") empates++;
+
+  updateScoreboard();
+  saveScoreboard();
+
+  $("#resultado").text(message);
   finalizeButtons();
 }
 
-// atualiza a pontuação do dealer na interface
+// atualiza as cartas e a pontuação do dealerS na interface
 function updateDealer() {
   const dealerScore = game.getScore(game.getDealerCards());
-  document.getElementById("pontuacao-dealer").innerText = dealerScore;
+  $("#pontuacao-dealer").text(dealerScore);
 }
 
 // atualiza as cartas e a pontuação do jogador na interface
 function updatePlayer(state) {
   const playerCards = game.getPlayerCards();
-  document.getElementById("cartas-jogador").innerHTML = "";
+  $("#cartas-jogador").html("");
   for (const card of playerCards) {
-    printCard(document.getElementById("cartas-jogador"), card);
+    printCard($("#cartas-jogador"), card);
   }
-  document.getElementById("pontuacao-jogador").innerText =
-    game.getScore(playerCards);
+  $("#pontuacao-jogador").text(game.getScore(playerCards));
 
   if (state && state.gameEnded) {
     finalScore(state);
@@ -109,34 +175,32 @@ function updatePlayer(state) {
 // faz o dealer tirar uma nova carta
 function dealerNewCard() {
   const state = game.dealerMove();
-  // limpa e reimprime as cartas do dealer
+  // limpa e mostra de novo as cartas do dealer
   const dealerCards = game.getDealerCards();
-  document.getElementById("cartas-dealer").innerHTML = "";
+  $("#cartas-dealer").html("");
   for (const card of dealerCards) {
-    printCard(document.getElementById("cartas-dealer"), card);
+    printCard($("#cartas-dealer"), card);
   }
   updateDealer();
-  debug(game);
   return state;
 }
 
-// faz o jogador tirar uma nova carta (ação do botão "Pedir Carta")
+// faz o jogador tirar uma nova carta
 function playerNewCard() {
   const state = game.playerMove();
   updatePlayer(state);
-  debug(game);
 }
 
-// finaliza a vez do jogador e inicia a vez do dealer (ação do botão "Ficar")
+// finaliza a vez do jogador e inicia a vez do dealer
 function dealerFinish() {
   game.setDealerTurn(true);
-  finalizeButtons(); // desativa botões do jogador
+  finalizeButtons();
 
   // revela a carta escondida do dealer
   const dealerCards = game.getDealerCards();
-  document.getElementById("cartas-dealer").innerHTML = "";
+  $("#cartas-dealer").html("");
   for (const card of dealerCards) {
-    printCard(document.getElementById("cartas-dealer"), card);
+    printCard($("#cartas-dealer"), card);
   }
   updateDealer();
 
@@ -144,24 +208,40 @@ function dealerFinish() {
   let state = game.getGameState();
   // se o jogo não terminou depois de revelar as cartas, o dealer joga
   if (!state.gameEnded) {
-    const dealerInterval = setInterval(() => {
-      state = game.getGameState(); // reavalia o estado antes de cada jogada
+    const dealerInterval = setInterval(function () {
+      state = game.getGameState();
       if (!state.gameEnded) {
         dealerNewCard();
       } else {
         clearInterval(dealerInterval); // para o loop
         finalScore(state);
       }
-    }, 1000); // espera 1 segundo entre cada jogada do dealer dara dinamizar
+    }, 1000); // espera 1 segundo
   } else {
     // se o jogo acabar quando as cartas forem reveladas, mostra o resultado final
     finalScore(state);
   }
 }
 
-// imprime a imagem da carta na interface grafica
+// imprime a imagem da carta na interface
 function printCard(element, card) {
-  let cardImg = document.createElement("img"); // elemento onde a carta será mostrada
-  cardImg.src = `img/png/${card}.png`;
-  element.appendChild(cardImg);
+  const cardImg = $("<img>").attr("src", `img/png/${card}.png`);
+  element.append(cardImg);
 }
+
+// executa so quando o documento html estiver totalmente carregado
+$(document).ready(function () {
+  // reset no placar ao dar reload
+  localStorage.removeItem("blackjack_totalDealerWins");
+  localStorage.removeItem("blackjack_empates");
+  localStorage.removeItem("blackjack_totalPlayerWins");
+  totalDealerWins = empates = totalPlayerWins = 0;
+  updateScoreboard();
+
+  // associa as funções aos cliques dos botões
+  $("#card").on("click", playerNewCard);
+  $("#stand").on("click", dealerFinish);
+  $("#new_game").on("click", newGame);
+
+  newGame();
+});
